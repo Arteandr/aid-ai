@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 from fastapi import HTTPException, Request
 
-from src.auth.service import get_current_user
 from src.users.models import UserRole
+import src.users.service as users_service
 
 
 class BasePermission(ABC):
@@ -19,7 +19,7 @@ class BasePermission(ABC):
     def has_required_permissions(self, request: Request) -> bool: ...
 
     def __init__(self, request: Request):
-        user = get_current_user(request)
+        user = users_service.get_current_user(request)
         if not user:
             raise HTTPException(status_code=self.user_error_code, detail=self.user_error_msg)
         self.role = user.role

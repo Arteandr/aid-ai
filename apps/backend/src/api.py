@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from src.auth.view import auth_router
+from src.users.view import users_router
 
 class ErrorMessage(BaseModel):
     msg: str
@@ -22,3 +23,4 @@ api_router = APIRouter(
 )
 
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
+api_router.include_router(users_router, prefix="/users", tags=["users"])

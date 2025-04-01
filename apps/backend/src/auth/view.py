@@ -1,10 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 
-from src.auth.permissions import PermissionsDependency, UserPermission
-from src.auth.service import CurrentUser
 from src.database.core import DbSession
 import src.users.service as users_service
-from .models import (UserLoginResponse, UserRead, UserRegister, UserLogin, UserRegisterResponse)
+from .models import (UserLoginResponse, UserRegister, UserLogin, UserRegisterResponse)
 
 auth_router = APIRouter()
 
@@ -25,21 +23,9 @@ def login_user(db: DbSession,
                      user_in: UserLogin):
     user = users_service.get_user_by_email(db, user_in.email)
     if user and user.verify_password(user_in.password):
-        return {"token": user.token}
+        return user
     
     raise HTTPException(status_code=401, detail="Неверный пароль или email")
 
-
-@auth_router.get("/me", dependencies=[
-    Depends(
-        PermissionsDependency(
-            [
-                UserPermission
-            ]
-        )
-    )
-], response_model=UserRead)
-def get_me(current_user: CurrentUser):
-    return current_user
 
     
