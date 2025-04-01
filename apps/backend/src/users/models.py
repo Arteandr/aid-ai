@@ -5,6 +5,7 @@ import bcrypt
 import jwt
 import pytz
 from sqlalchemy import Column, Enum, Integer, LargeBinary, String
+from sqlalchemy.orm import relationship
 
 from src.config import get_config
 from src.models import Base, TimeStampMixin
@@ -25,6 +26,8 @@ class User(Base, TimeStampMixin):
     email = Column(String, unique=True)
     password = Column(LargeBinary, nullable=False)
     role = Column(Enum(UserRole), nullable=False, default=UserRole.USER)
+
+    chats = relationship("Chat", back_populates="creator", cascade="all, delete-orphan")
 
     def verify_password(self, password: str) -> bool:
         if not password or not self.password:
