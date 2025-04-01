@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta
 import enum
+from datetime import datetime, timedelta
+
 import bcrypt
 import jwt
 import pytz
@@ -11,9 +12,11 @@ from src.models import Base, TimeStampMixin
 utc_zone = pytz.UTC
 config = get_config()
 
+
 class UserRole(enum.Enum):
     USER = "user"
     SUPPORT_AGENT = "support_agent"
+
 
 class User(Base, TimeStampMixin):
     __tablename__ = "users"
@@ -26,7 +29,7 @@ class User(Base, TimeStampMixin):
     def verify_password(self, password: str) -> bool:
         if not password or not self.password:
             raise ValueError("Пароль не может быть пустым")
-        return bcrypt.checkpw(password.encode('utf-8'), self.password)
+        return bcrypt.checkpw(password.encode("utf-8"), self.password)
 
     @property
     def token(self):

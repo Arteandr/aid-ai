@@ -1,19 +1,24 @@
 from typing import List, Optional
+
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+
 from src.auth.view import auth_router
 from src.users.view import users_router
+
 
 class ErrorMessage(BaseModel):
     msg: str
 
+
 class ErrorResponse(BaseModel):
     detail: Optional[List[ErrorMessage]]
 
+
 api_router = APIRouter(
     default_response_class=JSONResponse,
-    responses = {
+    responses={
         400: {"model": ErrorResponse},
         401: {"model": ErrorResponse},
         403: {"model": ErrorResponse},

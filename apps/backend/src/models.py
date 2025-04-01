@@ -1,4 +1,5 @@
-from datetime import datetime, timezone
+from datetime import datetime
+
 from pydantic import conint
 from sqlalchemy import Column, DateTime, event
 from sqlalchemy.ext.declarative import declarative_base
@@ -6,6 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 PrimaryKey = conint(gt=0, lt=2147483647)
 Base = declarative_base()
 metadata = Base.metadata
+
 
 class TimeStampMixin(object):
     created_at = Column(DateTime, default=datetime.utcnow())
