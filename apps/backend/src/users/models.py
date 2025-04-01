@@ -34,6 +34,9 @@ class User(Base, TimeStampMixin):
             raise ValueError("Пароль не может быть пустым")
         return bcrypt.checkpw(password.encode("utf-8"), self.password)
 
+    def is_support_agent(self) -> bool:
+        return self.role == UserRole.SUPPORT_AGENT
+
     @property
     def token(self):
         now = datetime.now(utc_zone)

@@ -1,7 +1,12 @@
-from sqlalchemy import Column, ForeignKey, Integer
-from sqlalchemy.orm import relationship
+from typing import List
 
+from pydantic import BaseModel
+from sqlalchemy import Column, ForeignKey, Integer
+from sqlalchemy.orm import Mapped, relationship
+
+from src.messages.models import MessageBase
 from src.models import Base, TimeStampMixin
+from src.users.models import User
 
 
 class Chat(Base, TimeStampMixin):
@@ -12,8 +17,12 @@ class Chat(Base, TimeStampMixin):
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
 
-    creator = relationship("User", back_populates="chats")
+    creator: Mapped[User] = relationship("User", back_populates="chats")
 
     messages = relationship(
         "Message", back_populates="chat", cascade="all, delete-orphan"
     )
+
+
+class ChatHistoryResponse(BaseModel):
+    messages: List[MessageBase] = None
