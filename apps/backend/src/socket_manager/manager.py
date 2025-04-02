@@ -4,7 +4,11 @@ from typing import Annotated
 from fastapi import Depends, WebSocket
 
 from src.database.core import SessionLocal
-from src.socket_manager.models import ResponseSocketMessage, ResponseSocketMessageData
+from src.socket_manager.models import (
+    ResponseMessageCommand,
+    ResponseSocketMessage,
+    ResponseSocketMessageData,
+)
 
 
 class ConnectionManager:
@@ -22,8 +26,13 @@ class ConnectionManager:
     async def send_json(self, data: dict, websocket: WebSocket):
         await websocket.send_json(data)
 
-    async def send_message(self, data: ResponseSocketMessageData, websocket: WebSocket):
-        socket_message = ResponseSocketMessage(data=data)
+    async def send_message(
+        self,
+        command: ResponseMessageCommand,
+        data: ResponseSocketMessageData,
+        websocket: WebSocket,
+    ):
+        socket_message = ResponseSocketMessage(data=data, command=command)
         await websocket.send_text(socket_message.model_dump_json())
 
 

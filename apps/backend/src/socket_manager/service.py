@@ -13,6 +13,7 @@ from .models import (
     NewMessageData,
     RequestMessageCommand,
     RequestSocketMessage,
+    ResponseMessageCommand,
     SendMessageData,
 )
 
@@ -58,4 +59,8 @@ async def on_send_message(
     response_data = NewMessageData(
         message=MessageBase.model_validate(new_message), chat_id=new_message.chat_id
     )
-    await manager.send_message(data=response_data, websocket=websocket)
+    await manager.send_message(
+        data=response_data,
+        websocket=websocket,
+        command=ResponseMessageCommand.NEW_MESSAGE,
+    )

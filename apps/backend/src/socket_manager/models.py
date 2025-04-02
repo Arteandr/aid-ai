@@ -35,4 +35,5 @@ type ResponseSocketMessageData = NewMessageData
 
 
 class ResponseSocketMessage(BaseModel):
+    command: ResponseMessageCommand
     data: ResponseSocketMessageData
