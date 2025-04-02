@@ -1,11 +1,11 @@
 from typing import Annotated
 
 import jwt
-from fastapi import Depends, HTTPException, Request
+from fastapi import Depends, HTTPException, Request, WebSocket
 from fastapi.security.utils import get_authorization_scheme_param
 
 from src.config import get_config
-from src.database.core import DbSession
+from src.database.core import DbSession, DbSessionWs
 
 from .models import User
 
@@ -57,3 +57,28 @@ def get_current_user(req: Request) -> User:
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+async def get_current_user_ws(db: DbSessionWs, websocket: WebSocket) -> User:
+    authorization: str = websocket.headers.get("Authorization")
+    scheme, param = get_authorization_scheme_param(authorization)
+
+    if not authorization or scheme.lower() != "bearer":
+        await websocket.close(code=1008)
+        raise HTTPException(status_code=401, detail={"msg": "Не авторизован"})
+
+    token = param
+
+    try:
+        data = jwt.decode(token, config.jwt_secret, algorithms=[config.jwt_alghorithm])
+    except Exception:
+        await websocket.close(code=1008)
+        raise HTTPException(status_code=401, detail={"msg": "Неверный токен"}) from None
+
+    user_email = data.get("email")
+    if not user_email:
+        await websocket.close(code=1008)
+        raise InvalidCredentialException
+
+    user = get_user_by_email(db, user_email)
+    return user

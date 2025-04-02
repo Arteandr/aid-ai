@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from src.api import api_router
 from src.exceptions import AidException, ErrorResponse
 from src.middleware import DBSessionMiddleware
+from src.socket_manager.view import ws_router
 
 app = FastAPI(
     title="AidAI",
@@ -19,5 +20,6 @@ def app_exception_handler(request: Request, exc: AidException):
 
 
 app.include_router(api_router)
+app.include_router(ws_router)
 
 app.add_middleware(DBSessionMiddleware)

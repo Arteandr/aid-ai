@@ -1,5 +1,8 @@
+from typing import Optional
+
 from sqlalchemy import desc
 
+import src.messages.service as message_service
 from src.database.core import DbSession
 from src.messages.models import Message
 
@@ -25,3 +28,16 @@ def history(db: DbSession, chat_id: int) -> list[Message]:
         .order_by(desc(Message.created_at))
         .all()
     )
+
+
+def process_discussion(
+    db: DbSession, current_user_id: int, chat_id: Optional[int], text: str
+) -> Message:
+    if not chat_id:
+        chat = create(db, current_user_id)
+    else:
+        chat = get_one_by_id(db, chat_id)
+
+    message = message_service.create(db, text, chat.id, current_user_id)
+
+    return message

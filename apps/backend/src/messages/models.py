@@ -34,3 +34,8 @@ class MessageBase(BaseModel):
     text: str
     sender_role: UserRole
     created_at: datetime
+
+    model_config = {
+        "from_attributes": True,
+        "json_encoders": {UserRole: lambda v: v.value},
+    }

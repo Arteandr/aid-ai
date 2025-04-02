@@ -14,9 +14,18 @@ SessionLocal = sessionmaker(
 )
 
 
-def get_sync_db(request: Request) -> Session:
+def get_db_from_request(request: Request) -> Session:
     session = request.state.db
     return session
 
 
-DbSession = Annotated[Session, Depends(get_sync_db)]
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+DbSession = Annotated[Session, Depends(get_db_from_request)]
+DbSessionWs = Annotated[Session, Depends(get_db)]
