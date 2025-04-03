@@ -1,1 +1,53 @@
-<p>auth works!</p>
+<div class="auth-page">
+  <div class="login-wrapper">
+    <form class="login">
+      <div class="login-header"></div>
+      <div class="login-body">
+        <section class="title">
+          <div>Авторизация</div>
+        </section>
+        <div class="login-group">
+          <clr-input-container>
+            <label class="clr-sr-only">E-mail</label>
+            <input
+              type="text"
+              name="username"
+              clrInput
+              placeholder="Введите E-mail"
+              [(ngModel)]="form.username"
+            />
+          </clr-input-container>
+          <clr-password-container>
+            <label class="clr-sr-only">Пароль</label>
+            <input
+              type="password"
+              name="password"
+              clrPassword
+              placeholder="Введите пароль"
+              [(ngModel)]="form.password"
+            />
+          </clr-password-container>
+          <clr-checkbox-wrapper>
+            <label>Запомнить меня</label>
+            <input
+              type="checkbox"
+              name="rememberMe"
+              clrCheckbox
+              [(ngModel)]="form.rememberMe"
+            />
+          </clr-checkbox-wrapper>
+          <div class="error active" *ngIf="error">
+            {{ error.message }}
+          </div>
+          <button type="submit" class="btn btn-primary" (click)="submit()">
+            Войти
+          </button>
+          <a href="javascript://" class="signup">Создать учетную запись</a>
+        </div>
+      </div>
+      <div class="login-footer">
+        <span class="copyright"> Copyright © 2025 Рязанов Н. А. </span>
+      </div>
+    </form>
+  </div>
+</div>
