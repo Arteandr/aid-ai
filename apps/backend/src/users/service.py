@@ -1,18 +1,19 @@
 from typing import Annotated
 
 import jwt
-from fastapi import Depends, HTTPException, Request, WebSocket
+from fastapi import Depends, Request, WebSocket
 from fastapi.security.utils import get_authorization_scheme_param
 
 from src.config import get_config
 from src.database.core import DbSession, DbSessionWs
+from src.exceptions import InternalError, UnauthorizedError
 
 from .models import User
 
 config = get_config()
 
 
-def get_user_by_email(db: DbSession, email: str):
+def get_user_by_email(db: DbSession, email: str) -> User | None:
     return db.query(User).filter(User.email == email).one_or_none()
 
 
@@ -24,16 +25,12 @@ def create(db: DbSession, email: str, hashed_password: str):
     return user
 
 
-InvalidCredentialException = HTTPException(
-    status_code=401, detail=[{"msg": "Неверные данные для входа"}]
-)
+InvalidCredentialException = UnauthorizedError("Неверные данные для входа")
 
 
 def get_current_user(req: Request) -> User:
     if not req.state.db:
-        raise HTTPException(
-            status_code=400, detail={"msg": "Ошибка подключения к базе данных"}
-        )
+        raise InternalError(message="Ошибка подключения к базе данных")
 
     authorization: str = req.headers.get("Authorization")
     scheme, param = get_authorization_scheme_param(authorization)
@@ -43,9 +40,9 @@ def get_current_user(req: Request) -> User:
     token = authorization.split()[1]
 
     try:
-        data = jwt.decode(token, config.jwt_secret, config.jwt_alghorithm)
+        data = jwt.decode(token, config.jwt_access_secret, config.jwt_alghorithm)
     except Exception:
-        raise HTTPException(status_code=401, detail={"msg": "Неверный токен"}) from None
+        raise UnauthorizedError(message="Неверный токен")
 
     user_email = data["email"]
     if not user_email:
@@ -65,15 +62,17 @@ async def get_current_user_ws(db: DbSessionWs, websocket: WebSocket) -> User:
 
     if not authorization or scheme.lower() != "bearer":
         await websocket.close(code=1008)
-        raise HTTPException(status_code=401, detail={"msg": "Не авторизован"})
+        raise UnauthorizedError(message="Неверный токен")
 
     token = param
 
     try:
-        data = jwt.decode(token, config.jwt_secret, algorithms=[config.jwt_alghorithm])
+        data = jwt.decode(
+            token, config.jwt_access_secret, algorithms=[config.jwt_alghorithm]
+        )
     except Exception:
         await websocket.close(code=1008)
-        raise HTTPException(status_code=401, detail={"msg": "Неверный токен"}) from None
+        raise UnauthorizedError(message="Неверный токен")
 
     user_email = data.get("email")
     if not user_email:

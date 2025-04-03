@@ -10,7 +10,6 @@ from sqlalchemy.orm import relationship
 from src.config import get_config
 from src.models import Base, TimeStampMixin
 
-utc_zone = pytz.UTC
 config = get_config()
 
 
@@ -39,13 +38,28 @@ class User(Base, TimeStampMixin):
 
     @property
     def token(self):
+        utc_zone = pytz.UTC
         now = datetime.now(utc_zone)
-        print("Now is %s" % now)
-        print("Calculated is %s" % (now + timedelta(minutes=config.jwt_expire_minutes)))
-        exp = (now + timedelta(minutes=config.jwt_expire_minutes)).timestamp()
+        exp = (now + timedelta(minutes=config.jwt_access_expire_minutes)).timestamp()
         data = {
             "exp": exp,
             "id": self.id,
             "email": self.email,
         }
-        return jwt.encode(data, config.jwt_secret, algorithm=config.jwt_alghorithm)
+        return jwt.encode(
+            data, config.jwt_access_secret, algorithm=config.jwt_alghorithm
+        )
+
+    @property
+    def refresh_token(self):
+        utc_zone = pytz.UTC
+        now = datetime.now(utc_zone)
+        exp = (now + timedelta(minutes=config.jwt_refresh_expire_minutes)).timestamp()
+        data = {
+            "exp": exp,
+            "id": self.id,
+            "email": self.email,
+        }
+        return jwt.encode(
+            data, config.jwt_refresh_secret, algorithm=config.jwt_alghorithm
+        )

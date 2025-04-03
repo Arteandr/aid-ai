@@ -50,6 +50,10 @@ class UserRegisterResponse(UserLoginResponse):
     pass
 
 
+class UserRefreshResponse(BaseModel):
+    token: Optional[str] = Field(None, nullable=True)
+
+
 class UserRead(UserBase):
     id: PrimaryKey
     role: Optional[str] = Field(None, nullable=True)
