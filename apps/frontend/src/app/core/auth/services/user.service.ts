@@ -42,7 +42,6 @@ export class UserService {
   }
 
   register(credentials: {
-    username: string;
     email: string;
     password: string;
   }): Observable<{ token: string }> {

@@ -36,7 +36,7 @@ import {
   TuiPush,
 } from '@taiga-ui/kit';
 import { TuiCardLarge, TuiForm, TuiHeader } from '@taiga-ui/layout';
-import { switchMap, take } from 'rxjs';
+import { switchMap, take, timeout } from 'rxjs';
 
 @Component({
   selector: 'app-auth-page',
@@ -64,7 +64,6 @@ import { switchMap, take } from 'rxjs';
     TuiDataListWrapper,
     TuiPush,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class AuthComponent {
   destroyRef = inject(DestroyRef);
@@ -102,20 +101,26 @@ export default class AuthComponent {
     this.error = null;
     this.isSubmitting = true;
 
-    let observable = this.userService.login({
+    const credentials = {
       email: this.form.value.email || '',
       password: this.form.value.password || '',
-    });
+    };
 
-    observable.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.alert.open('Вы успешно авторизовались!').subscribe();
-        this.router.navigateByUrl('/');
-      },
-      error: (err) => {
-        this.error = err;
-        this.isSubmitting = false;
-      },
-    });
+    let observable = this.form.value.isLogin
+      ? this.userService.login(credentials)
+      : this.userService.register(credentials);
+
+    observable
+      .pipe(takeUntilDestroyed(this.destroyRef), timeout(2000))
+      .subscribe({
+        next: () => {
+          this.alert.open('Вы успешно авторизовались!').subscribe();
+          this.router.navigateByUrl('/');
+        },
+        error: (err) => {
+          this.error = err;
+          this.isSubmitting = false;
+        },
+      });
   }
 }

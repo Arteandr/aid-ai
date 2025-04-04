@@ -22,6 +22,7 @@ const routes: Routes = [
   {
     path: 'login',
     loadComponent: () => import('./core/auth/auth.component'),
+    canActivate: [AuthGuard],
   },
   {
     path: '**',

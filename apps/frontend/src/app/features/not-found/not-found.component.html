@@ -1,12 +1,17 @@
-<tui-block-status>
-  <img
-    alt="not found"
-    src="./assets/images/not-found.svg"
-    tuiSlot="top"
-    class="image"
-  />
+<div class="h-[100vh] w-full flex items-center justify-center">
+  <tui-block-status>
+    <img alt="not found" src="cancel.svg" tuiSlot="top" />
 
-  <h4>Not found</h4>
+    <h4>Ничего не найдено</h4>
 
-  Try to find by number
-</tui-block-status>
+    Попробуйте перейти на другую страницу
+    <button
+      appearance="secondary"
+      tuiButton
+      type="button"
+      (click)="toMainPage()"
+    >
+      На главную
+    </button>
+  </tui-block-status>
+</div>

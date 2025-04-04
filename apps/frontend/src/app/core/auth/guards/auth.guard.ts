@@ -24,8 +24,13 @@ export class AuthGuard implements CanActivate {
   ): MaybeAsync<GuardResult> {
     const token = this.jwtService.getToken();
 
-    if (!token) {
+    if (!token && state.url != '/login') {
       this.router.navigate(['/login']);
+      return false;
+    }
+
+    if (token && state.url == '/login') {
+      this.router.navigate(['/']);
       return false;
     }
 
