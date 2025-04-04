@@ -1,53 +1,54 @@
-<div class="auth-page">
-  <div class="login-wrapper">
-    <form class="login">
-      <div class="login-header"></div>
-      <div class="login-body">
-        <section class="title">
-          <div>Авторизация</div>
-        </section>
-        <div class="login-group">
-          <clr-input-container>
-            <label class="clr-sr-only">E-mail</label>
-            <input
-              type="text"
-              name="username"
-              clrInput
-              placeholder="Введите E-mail"
-              [(ngModel)]="form.username"
-            />
-          </clr-input-container>
-          <clr-password-container>
-            <label class="clr-sr-only">Пароль</label>
-            <input
-              type="password"
-              name="password"
-              clrPassword
-              placeholder="Введите пароль"
-              [(ngModel)]="form.password"
-            />
-          </clr-password-container>
-          <clr-checkbox-wrapper>
-            <label>Запомнить меня</label>
-            <input
-              type="checkbox"
-              name="rememberMe"
-              clrCheckbox
-              [(ngModel)]="form.rememberMe"
-            />
-          </clr-checkbox-wrapper>
-          <div class="error active" *ngIf="error">
-            {{ error.message }}
-          </div>
-          <button type="submit" class="btn btn-primary" (click)="submit()">
-            Войти
-          </button>
-          <a href="javascript://" class="signup">Создать учетную запись</a>
-        </div>
-      </div>
-      <div class="login-footer">
-        <span class="copyright"> Copyright © 2025 Рязанов Н. А. </span>
-      </div>
-    </form>
-  </div>
+<div class="w-full flex justify-center">
+  <form
+    class="mt-40"
+    tuiAppearance="floating"
+    tuiCardLarge
+    tuiForm="m"
+    [formGroup]="form"
+    [style.min-width.rem]="35"
+    (ngSubmit)="submit()"
+  >
+    <header tuiHeader>
+      <h2 tuiTitle>
+        {{ form.value.isLogin ? "Вход" : "Регистрация" }}
+        <span tuiSubtitle>Используйте учетные данные от платформы</span>
+      </h2>
+      <span tuiAccessories>
+        <tui-segmented>
+          <label>
+            <input formControlName="isLogin" type="radio" [value]="true" />
+            Вход
+          </label>
+          <label>
+            <input formControlName="isLogin" type="radio" [value]="false" />
+            Регистрация
+          </label>
+        </tui-segmented>
+      </span>
+    </header>
+    <tui-notification appearance="error" *ngIf="error">
+      <h3 tuiTitle>
+        Ошибка входа
+        <span tuiSubtitle>{{ error.message }}</span>
+      </h3>
+    </tui-notification>
+    <tui-textfield>
+      <label tuiLabel>Почта</label>
+      <input
+        formControlName="email"
+        placeholder="email@test.com"
+        tuiTextfield
+      />
+    </tui-textfield>
+    <tui-textfield>
+      <label tuiLabel>Пароль</label>
+      <input formControlName="password" tuiTextfield type="password" />
+      <tui-icon tuiPassword />
+    </tui-textfield>
+    <ng-container *ngIf="!form.controls.isLogin.value"> </ng-container>
+    <tui-error [error]="[] | tuiFieldError | async" />
+    <footer>
+      <button tuiButton type="submit" [disabled]="!form.valid">Далее</button>
+    </footer>
+  </form>
 </div>
