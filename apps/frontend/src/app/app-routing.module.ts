@@ -9,12 +9,13 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () =>
-          import('./pages/default-page/default-page.component'),
+        redirectTo: 'chat',
+        pathMatch: 'full',
       },
       {
         path: 'chat',
         loadComponent: () => import('./pages/chat-page/chat-page.component'),
+        data: { breadcrumb: 'Диалоги' },
       },
     ],
     canActivate: [AuthGuard],

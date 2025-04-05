@@ -2,7 +2,9 @@ import { inject, NgModule, provideAppInitializer } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
+import { provideEventPlugins } from '@taiga-ui/event-plugins';
 import { EMPTY } from 'rxjs';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -11,8 +13,6 @@ import { UserService } from './core/auth/services/user.service';
 import { apiInterceptor } from './core/interceptors/api.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { tokenInterceptor } from './core/interceptors/token.interceptor';
-import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideEventPlugins } from '@taiga-ui/event-plugins';
 
 import { TuiRoot } from '@taiga-ui/core';
 

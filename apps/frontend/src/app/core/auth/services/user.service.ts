@@ -25,8 +25,8 @@ export class UserService {
     private readonly router: Router
   ) {}
 
-  get user() {
-    return this.currentUser;
+  public get user() {
+    return this.currentUser();
   }
 
   login(credentials: {
@@ -50,7 +50,12 @@ export class UserService {
         email: credentials.email,
         password: credentials.password,
       })
-      .pipe(tap(({ token }) => this.setAuth(token)));
+      .pipe(
+        tap(({ token }) => {
+          this.setAuth(token);
+          this.getCurrentUser().subscribe();
+        })
+      );
   }
 
   logout(): void {

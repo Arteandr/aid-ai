@@ -1,23 +1,52 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { NavigationEnd, Router, RouterModule } from '@angular/router';
-import { filter } from 'rxjs';
+import { AsyncPipe, CommonModule, JsonPipe } from '@angular/common';
+import { Component, signal } from '@angular/core';
+import { RouterLinkActive, RouterModule } from '@angular/router';
+import {
+  TuiAppearance,
+  TuiButton,
+  TuiDataList,
+  TuiDropdown,
+  TuiIcon,
+  TuiTextfield,
+} from '@taiga-ui/core';
+import { TuiAvatar, TuiAvatarOutline, TuiBadge, TuiTabs } from '@taiga-ui/kit';
+import { TuiNavigation } from '@taiga-ui/layout';
+
+import { FormsModule } from '@angular/forms';
+import { UserService } from '../../core/auth/services/user.service';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
-  imports: [CommonModule, RouterModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    RouterLinkActive,
+    TuiAppearance,
+    TuiButton,
+    TuiIcon,
+    TuiBadge,
+    TuiDataList,
+    TuiDropdown,
+    TuiNavigation,
+    TuiTabs,
+    TuiTextfield,
+    TuiAvatar,
+    TuiAvatarOutline,
+  ],
 })
 export default class HomeComponent {
-  isChatTab: boolean = false;
+  protected expanded = signal(true);
+  protected open = false;
+  protected switch = false;
+  protected readonly routes: any = {};
 
-  constructor(private readonly router: Router) {
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.isChatTab = this.router.url.includes('/chat');
-      });
+  constructor(public userService: UserService) {}
+
+  protected handleToggle(): void {
+    this.expanded.update((e) => !e);
   }
 }
