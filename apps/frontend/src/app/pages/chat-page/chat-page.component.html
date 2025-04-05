@@ -1,1 +1,35 @@
-<p>chat-page works!</p>
+<div class="page flex">
+  <div class="p-5 h-32 w-full border-b border-gray-200 space-y-2">
+    <div class="text-xl font-semibold w-full">Обращения</div>
+    <form [formGroup]="filterForm" class="w-full flex gap-x-2">
+      <div class="w-full">
+        <tui-textfield>
+          <label tuiLabel>Поиск</label>
+          <input
+            formControlName="search"
+            placeholder="Field placeholder"
+            tuiTextfield
+          />
+          <tui-icon tuiTooltip="A tooltip" />
+        </tui-textfield>
+        <tui-error
+          formControlName="search"
+          [error]="[] | tuiFieldError | async"
+        />
+      </div>
+      <div class="w-70">
+        <tui-select formControlName="filter">
+          Статус
+          <tui-data-list-wrapper *tuiDataList [items]="items" />
+        </tui-select>
+        <tui-error
+          formControlName="filter"
+          [error]="[] | tuiFieldError | async"
+        />
+      </div>
+      <div>
+        <button appearance="primary" tuiButton type="button">Применить</button>
+      </div>
+    </form>
+  </div>
+</div>
