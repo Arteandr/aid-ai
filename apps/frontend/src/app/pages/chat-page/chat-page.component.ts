@@ -1,15 +1,24 @@
-import { AsyncPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { AsyncPipe, CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { TuiButton, TuiError, TuiIcon, TuiTextfield } from '@taiga-ui/core';
+import {
+  TuiAppearance,
+  TuiButton,
+  TuiError,
+  TuiIcon,
+  TuiTextfield,
+} from '@taiga-ui/core';
 import { TuiDataListWrapper, TuiFieldErrorPipe } from '@taiga-ui/kit';
-import { TuiForm, TuiSearch } from '@taiga-ui/layout';
+import { TuiSearch } from '@taiga-ui/layout';
 import { TuiSelectModule } from '@taiga-ui/legacy';
+import { ChatElementComponent } from '../../features/chat-element/chat-element.component';
+import { ChatsService } from '../../core/chats/services/chats.service';
+import { ChatEmptyComponent } from '../../features/chat-empty/chat-empty.component';
 
 @Component({
   selector: 'app-chat-page',
@@ -19,6 +28,7 @@ import { TuiSelectModule } from '@taiga-ui/legacy';
   imports: [
     ReactiveFormsModule,
     FormsModule,
+    CommonModule,
     TuiSearch,
     TuiTextfield,
     TuiSelectModule,
@@ -27,14 +37,22 @@ import { TuiSelectModule } from '@taiga-ui/legacy';
     TuiError,
     TuiFieldErrorPipe,
     AsyncPipe,
-    TuiForm,
     TuiButton,
+    TuiAppearance,
+    ChatEmptyComponent,
+    ChatElementComponent,
   ],
 })
-export default class ChatPageComponent {
+export default class ChatPageComponent implements OnInit {
   filterForm = new FormGroup({
     search: new FormControl(''),
     filter: new FormControl('Все'),
   });
   items = ['Все', 'Открытые', 'Закрытые'];
+
+  constructor(public chatService: ChatsService) {}
+
+  ngOnInit(): void {
+    this.chatService.getMany().subscribe();
+  }
 }

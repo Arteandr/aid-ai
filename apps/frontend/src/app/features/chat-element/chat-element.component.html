@@ -1,0 +1,27 @@
+<div tuiCardLarge tuiAppearance="outline" class="card h-52">
+  <div tuiHeader>
+    <h1 tuiTitle>
+      {{ chat.name }}
+      <span tuiSubtitle class="flex items-center gap-x-1"
+        ><tui-icon icon="@tui.calendar" [style.font-size.rem]="1.1" />
+        <span
+          >Создано: {{ chat.createdAt | date : "dd/MM/YYYY hh:mm" }}</span
+        ></span
+      >
+    </h1>
+    <aside tuiAccessories>
+      <tui-badge appearance="positive" tuiStatus size="xl">
+        {{ chat.status === "open" ? "Открыто" : "Закрыто" }}
+      </tui-badge>
+    </aside>
+  </div>
+  <section>Replace me</section>
+  <footer>
+    <div *ngIf="chat.messages[0]">
+      <span tuiSubtitle class="flex items-center gap-x-1"
+        ><tui-icon icon="@tui.calendar" [style.font-size.rem]="1.1" />
+        <span>Последнее сообщение: {{ chat.messages[0].createdAt }}</span></span
+      >
+    </div>
+  </footer>
+</div>

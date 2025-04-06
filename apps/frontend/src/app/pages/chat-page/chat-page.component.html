@@ -1,5 +1,7 @@
-<div class="page flex">
-  <div class="p-5 h-32 w-full border-b border-gray-200 space-y-2">
+<div class="page flex flex-col h-full">
+  <div
+    class="p-5 h-32 fixed top-0 sm:left-0 md:left-64 right-0 z-40 bg-white border-b border-gray-200 space-y-2"
+  >
     <div class="text-xl font-semibold w-full">Обращения</div>
     <form [formGroup]="filterForm" class="w-full flex gap-x-2">
       <div class="w-full">
@@ -28,8 +30,21 @@
         />
       </div>
       <div>
-        <button appearance="primary" tuiButton type="button">Применить</button>
+        <button
+          appearance="primary"
+          tuiButton
+          type="button"
+          [disabled]="chatService.chats.length === 0"
+        >
+          Применить
+        </button>
       </div>
     </form>
+  </div>
+  <div class="mt-32 flex-1 p-4 grid xl:grid-cols-3 md:grid-cols-2 gap-5">
+    <app-chat-element *ngFor="let chat of chatService.chats()" [chat]="chat" />
+    <ng-template #empty>
+      <app-chat-empty />
+    </ng-template>
   </div>
 </div>
