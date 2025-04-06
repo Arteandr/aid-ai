@@ -1,11 +1,13 @@
+from typing import List
+
 from fastapi import APIRouter
 
-from src.chats.models import ChatHistoryResponse
+from src.chats.models import ChatHistoryResponse, ChatResponse
 from src.database.core import DbSession
 from src.exceptions import BadRequestError, NotFoundError
 from src.users.service import CurrentUser
 
-from .service import create, get_one_by_id, history
+from .service import create, get_many, get_one_by_id, history
 
 chats_router = APIRouter()
 
@@ -15,6 +17,13 @@ def create_chat(db: DbSession, current_user: CurrentUser):
     chat = create(db, current_user.id)
 
     return chat
+
+
+@chats_router.get("", response_model=List[ChatResponse])
+def get_chat_list(db: DbSession, current_user: CurrentUser):
+    chats = get_many(db, currentUser=current_user)
+    print("CHAT ", chats[0].__dict__)
+    return chats
 
 
 @chats_router.get("/{chat_id}/history", response_model=ChatHistoryResponse)

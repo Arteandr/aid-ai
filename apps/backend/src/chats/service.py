@@ -1,16 +1,27 @@
 from typing import Optional
 
 from sqlalchemy import desc
+from sqlalchemy.orm import selectinload
 
 import src.messages.service as message_service
 from src.database.core import DbSession
 from src.messages.models import Message
+from src.users.models import User
 
 from .models import Chat
 
 
 def get_one_by_id(db: DbSession, id: int) -> Chat | None:
     return db.query(Chat).filter(Chat.id == id).one_or_none()
+
+
+def get_many(db: DbSession, currentUser: User) -> list[Chat]:
+    return (
+        db.query(Chat)
+        .options(selectinload(Chat.messages))
+        .filter(Chat.created_by == currentUser.id)
+        .all()
+    )
 
 
 def create(db: DbSession, created_by_id: int) -> Chat:
