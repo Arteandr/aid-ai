@@ -36,7 +36,6 @@
           appearance="accent"
           tuiButton
           type="button"
-          [disabled]="chatService.chats().length < 1"
         >
           <tui-icon icon="@tui.plus" />
           Добавить обращение
@@ -47,7 +46,7 @@
   <div class="mt-30 flex-1">
     <div
       *ngIf="chatService.chats().length !== 0; else empty"
-      class="lg:w-md w-xs h-full p-2 border-r border-gray-200 flex flex-col flex-wrap fixed overflow-x-auto scroll-smooth scrollbar-hidden space-y-2"
+      class="w-sm h-full p-2 border-r border-gray-200 flex flex-col flex-wrap fixed overflow-x-auto scroll-smooth scrollbar-hidden space-y-2"
     >
       <app-chat-element
         *ngFor="let chat of chatService.chats()"
@@ -58,7 +57,7 @@
     <ng-template #empty>
       <app-chat-empty />
     </ng-template>
-    <div class="ml-[448px] h-full">
+    <div class="ml-[384px] h-full">
       <router-outlet></router-outlet>
     </div>
   </div>

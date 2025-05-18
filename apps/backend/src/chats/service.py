@@ -30,7 +30,7 @@ def get_many(db: DbSession, currentUser: User) -> list[Chat]:
 
 
 def create(db: DbSession, created_by_id: int) -> Chat:
-    chat = Chat(created_by=created_by_id)
+    chat = Chat(created_by=created_by_id, name='Обращение 1')
     db.add(chat)
     db.commit()
     db.refresh(chat)
@@ -54,6 +54,6 @@ def process_discussion(
         chat = create(db, current_user_id)
     else:
         chat = get_one_by_id(db, chat_id)
-
+    print('CREATE IN CHATS SRV')
     message = message_service.create(db, text, chat.id, current_user_id)
     return message

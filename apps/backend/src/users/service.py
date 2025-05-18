@@ -52,7 +52,6 @@ def get_current_user(req: Request) -> User:
 
     return user
 
-
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
