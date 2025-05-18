@@ -57,14 +57,18 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 async def get_current_user_ws(db: DbSessionWs, websocket: WebSocket) -> User:
-    authorization: str = websocket.headers.get("Authorization")
-    scheme, param = get_authorization_scheme_param(authorization)
+    # authorization: str = websocket.headers.get("Authorization")
+    # scheme, param = get_authorization_scheme_param(authorization)
 
-    if not authorization or scheme.lower() != "bearer":
+    # if not authorization or scheme.lower() != "bearer":
+    #     await websocket.close(code=1008)
+    #     raise UnauthorizedError(message="Неверный токен")
+
+    token: str = websocket.query_params.get("token")
+
+    if not token:
         await websocket.close(code=1008)
-        raise UnauthorizedError(message="Неверный токен")
-
-    token = param
+        raise UnauthorizedError(message="Token is missing in query params")
 
     try:
         data = jwt.decode(

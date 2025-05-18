@@ -56,11 +56,12 @@ async def on_send_message(
     new_message = chats_service.process_discussion(
         db, current_user.id, data.chat_id, data.text
     )
-    response_data = NewMessageData(
-        message=MessageBase.model_validate(new_message), chat_id=new_message.chat_id
-    )
+    message = MessageBase.model_validate(new_message)
+    print("WATAFA", message)
+    response_data = NewMessageData(message=message, chat_id=new_message.chat_id)
+    response_payload = response_data.model_dump(by_alias=True)
     await manager.send_message(
-        data=response_data,
+        data=response_payload,
         websocket=websocket,
         command=ResponseMessageCommand.NEW_MESSAGE,
     )

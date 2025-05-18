@@ -1,7 +1,8 @@
 from datetime import datetime
 
 import pytz
-from pydantic import conint
+from pydantic import BaseModel, ConfigDict, conint
+from pydantic.alias_generators import to_camel
 from sqlalchemy import Column, DateTime, event
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -9,6 +10,15 @@ utc_zone = pytz.UTC
 PrimaryKey = conint(gt=0, lt=2147483647)
 Base = declarative_base()
 metadata = Base.metadata
+
+
+class BaseSchema(BaseModel):
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True,
+        from_attributes=True,
+        serialization_by_alias=True,  # добавляем, чтобы по умолчанию сериализовать с alias
+    )
 
 
 class TimeStampMixin(object):

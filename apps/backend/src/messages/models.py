@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from pydantic import BaseModel
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, relationship
 
-from src.models import Base, TimeStampMixin
+from src.auth.models import UserBase
+from src.models import Base, BaseSchema, TimeStampMixin
 from src.users.models import User, UserRole
 
 
@@ -29,13 +29,10 @@ class Message(Base, TimeStampMixin):
         return self.sender.role
 
 
-class MessageBase(BaseModel):
+class MessageBase(BaseSchema):
     id: int
     text: str
     sender_role: UserRole
+    sender: UserBase
+    sended_by: int
     created_at: datetime
-
-    model_config = {
-        "from_attributes": True,
-        "json_encoders": {UserRole: lambda v: v.value},
-    }

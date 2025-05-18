@@ -33,7 +33,7 @@ class ConnectionManager:
         websocket: WebSocket,
     ):
         socket_message = ResponseSocketMessage(data=data, command=command)
-        await websocket.send_text(socket_message.model_dump_json())
+        await websocket.send_text(socket_message.model_dump_json(by_alias=True))
 
 
 @lru_cache()

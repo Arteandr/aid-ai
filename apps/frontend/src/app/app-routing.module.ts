@@ -15,7 +15,13 @@ const routes: Routes = [
       {
         path: 'chat',
         loadComponent: () => import('./pages/chat-page/chat-page.component'),
-        data: { breadcrumb: 'Диалоги' },
+        children: [
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/chat-details/chat-details.component'),
+          },
+        ],
       },
     ],
     canActivate: [AuthGuard],

@@ -11,14 +11,21 @@ import {
   TuiButton,
   TuiError,
   TuiIcon,
+  TuiScrollbar,
   TuiTextfield,
 } from '@taiga-ui/core';
-import { TuiDataListWrapper, TuiFieldErrorPipe } from '@taiga-ui/kit';
+import {
+  TuiDataListWrapper,
+  TuiFieldErrorPipe,
+  TuiSkeleton,
+} from '@taiga-ui/kit';
 import { TuiSearch } from '@taiga-ui/layout';
 import { TuiSelectModule } from '@taiga-ui/legacy';
 import { ChatElementComponent } from '../../features/chat-element/chat-element.component';
 import { ChatsService } from '../../core/chats/services/chats.service';
 import { ChatEmptyComponent } from '../../features/chat-empty/chat-empty.component';
+import { tuiScrollbarOptionsProvider } from '@taiga-ui/core';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-chat-page',
@@ -26,6 +33,7 @@ import { ChatEmptyComponent } from '../../features/chat-empty/chat-empty.compone
   templateUrl: './chat-page.component.html',
   styleUrl: './chat-page.component.scss',
   imports: [
+    RouterModule,
     ReactiveFormsModule,
     FormsModule,
     CommonModule,
@@ -41,6 +49,13 @@ import { ChatEmptyComponent } from '../../features/chat-empty/chat-empty.compone
     TuiAppearance,
     ChatEmptyComponent,
     ChatElementComponent,
+    TuiSkeleton,
+    TuiScrollbar,
+  ],
+  providers: [
+    tuiScrollbarOptionsProvider({
+      mode: 'hover',
+    }),
   ],
 })
 export default class ChatPageComponent implements OnInit {

@@ -5,8 +5,8 @@ from src.database.core import SessionLocal
 
 
 class DBSessionMiddleware(BaseHTTPMiddleware):
-    def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request: Request, call_next):
         with SessionLocal() as session:
             request.state.db = session
-            response = call_next(request)
+            response = await call_next(request)
         return response

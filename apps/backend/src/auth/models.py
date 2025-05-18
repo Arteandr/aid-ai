@@ -3,7 +3,7 @@ from typing import Optional
 import bcrypt
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
-from src.models import PrimaryKey
+from src.models import BaseSchema, PrimaryKey
 
 
 def hash_password(password: str) -> bytes:
@@ -12,7 +12,7 @@ def hash_password(password: str) -> bytes:
     return bcrypt.hashpw(pw, salt)
 
 
-class UserBase(BaseModel):
+class UserBase(BaseSchema):
     email: EmailStr
 
     @field_validator("email")

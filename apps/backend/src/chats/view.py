@@ -22,8 +22,13 @@ def create_chat(db: DbSession, current_user: CurrentUser):
 @chats_router.get("", response_model=List[ChatResponse])
 def get_chat_list(db: DbSession, current_user: CurrentUser):
     chats = get_many(db, currentUser=current_user)
-    print("CHAT ", chats[0].__dict__)
     return chats
+
+
+@chats_router.get("/{chat_id}", response_model=ChatResponse)
+def get_chat(db: DbSession, current_user: CurrentUser, chat_id: int):
+    chat = get_one_by_id(db, chat_id)
+    return chat
 
 
 @chats_router.get("/{chat_id}/history", response_model=ChatHistoryResponse)

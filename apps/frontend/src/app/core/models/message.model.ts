@@ -1,12 +1,11 @@
-import { User } from '../auth/models/user.model';
-import { Chat } from '../chats/models/chat.model';
+import { User, UserRole } from '../auth/models/user.model';
 
 export interface Message {
   id: number;
   text: string;
+  sendedBy: number;
+  senderRole: UserRole;
   sender: User;
-  chat: Chat;
 
   createdAt: Date;
-  updatedAt: Date;
 }

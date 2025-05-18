@@ -2,13 +2,11 @@ import enum
 from datetime import datetime
 from typing import List
 
-from pydantic import BaseModel, ConfigDict
-from pydantic.alias_generators import to_camel
 from sqlalchemy import Column, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, relationship
 
 from src.messages.models import MessageBase
-from src.models import Base, TimeStampMixin
+from src.models import Base, BaseSchema, TimeStampMixin
 from src.users.models import User
 
 
@@ -34,7 +32,7 @@ class Chat(Base, TimeStampMixin):
     )
 
 
-class ChatResponse(BaseModel):
+class ChatResponse(BaseSchema):
     id: int
     name: str
     status: str
@@ -42,12 +40,6 @@ class ChatResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = ConfigDict(
-        alias_generator=to_camel,
-        populate_by_name=True,
-        from_attributes=True,
-    )
 
-
-class ChatHistoryResponse(BaseModel):
+class ChatHistoryResponse(BaseSchema):
     messages: List[MessageBase] = None
