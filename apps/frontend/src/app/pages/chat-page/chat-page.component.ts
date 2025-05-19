@@ -1,5 +1,5 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -26,6 +26,9 @@ import { ChatsService } from '../../core/chats/services/chats.service';
 import { ChatEmptyComponent } from '../../features/chat-empty/chat-empty.component';
 import { tuiScrollbarOptionsProvider } from '@taiga-ui/core';
 import { Router, RouterModule } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { ChatsWebsocketService } from '../../core/chats/services/chats-websocket.service';
+import { ResponseMessageCommand } from '../../core/chats/models/websocket-message.model';
 
 @Component({
   selector: 'app-chat-page',
@@ -58,14 +61,23 @@ import { Router, RouterModule } from '@angular/router';
     }),
   ],
 })
-export default class ChatPageComponent implements OnInit {
+export default class ChatPageComponent implements OnInit, OnDestroy {
   filterForm = new FormGroup({
     search: new FormControl(''),
     filter: new FormControl('Все'),
   });
   items = ['Все', 'Открытые', 'Закрытые'];
 
-  constructor(public chatService: ChatsService) {}
+  private sub = new Subscription();
+
+  constructor(
+    public chatService: ChatsService,
+    private ws: ChatsWebsocketService
+  ) {}
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+  }
 
   ngOnInit(): void {
     this.chatService.getMany().subscribe();

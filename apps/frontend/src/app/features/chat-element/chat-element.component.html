@@ -2,14 +2,14 @@
   [routerLink]="['/chat', chat.id]"
   routerLinkActive="bg-[var(--tui-background-base-alt)] rounded-2xl"
   [routerLinkActiveOptions]="{ exact: true }"
-  class="h-24 p-4 flex gap-x-2 z-40 transition-all hover:bg-[var(--tui-background-base-alt)] hover:cursor-pointer hover:rounded-2xl"
+  class="relative rounded-2xl items-center flex p-3 gap-x-2 z-40 transition-all hover:bg-[var(--tui-background-base-alt)] hover:cursor-pointer hover:rounded-2xl"
 >
-  <tui-avatar size="l">{{ chat.name.charAt(0) }}</tui-avatar>
+  <tui-avatar size="m">{{ chat.name.charAt(0) }}</tui-avatar>
   <div class="space-y-2">
     <h1 class="text-xl font-semibold">{{ chat.name }}</h1>
     <div class="text-sm">
       {{ lastMessageText() }}
     </div>
   </div>
-  <tui-badge appearance="positive" class="status" tuiStatus>Открыто</tui-badge>
+  <tui-badge appearance="positive" class="status " tuiStatus>Открыто</tui-badge>
 </a>

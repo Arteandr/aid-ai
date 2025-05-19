@@ -12,6 +12,16 @@ export class ChatsService {
 
   constructor(private readonly http: HttpClient) {}
 
+  addMessage(chatId: number, message: Message) {
+    this.chats.update((chats) =>
+      chats.map((chat) =>
+        chat.id === chatId
+          ? { ...chat, messages: [...(chat.messages || []), message] }
+          : chat
+      )
+    );
+  }
+
   getMany() {
     return this.http
       .get<Chat[]>('/chats')

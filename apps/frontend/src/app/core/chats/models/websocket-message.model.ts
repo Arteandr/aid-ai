@@ -26,7 +26,7 @@ export enum ResponseMessageCommand {
 
 export interface NewMessageData {
   message: Message;
-  chat_id: number;
+  chatId: number;
 }
 
 // Alias for clarity in ResponseSocketMessage type

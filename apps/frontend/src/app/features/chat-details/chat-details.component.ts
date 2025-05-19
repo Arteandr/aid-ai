@@ -1,11 +1,9 @@
+import { CommonModule } from '@angular/common';
 import {
-  AfterViewChecked,
   AfterViewInit,
   ChangeDetectorRef,
   Component,
   ElementRef,
-  inject,
-  Input,
   OnDestroy,
   OnInit,
   signal,
@@ -17,30 +15,23 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { TuiScrollService } from '@taiga-ui/cdk/services';
+import { TuiButton, TuiHint, TuiIcon } from '@taiga-ui/core';
+import { TuiAvatar } from '@taiga-ui/kit';
 import {
   TuiTextareaModule,
   TuiTextfieldControllerModule,
 } from '@taiga-ui/legacy';
-import { Message } from '../../core/models/message.model';
-import { ChatsService } from '../../core/chats/services/chats.service';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
-import {
-  TuiButton,
-  TuiHint,
-  TuiIcon,
-  TuiLink,
-  TuiScrollbar,
-} from '@taiga-ui/core';
-import { ChatsWebsocketService } from '../../core/chats/services/chats-websocket.service';
+import { UserService } from '../../core/auth/services/user.service';
 import {
   RequestMessageCommand,
   ResponseMessageCommand,
 } from '../../core/chats/models/websocket-message.model';
-import { UserService } from '../../core/auth/services/user.service';
-import { TuiScrollService } from '@taiga-ui/cdk/services';
-import { TuiAvatar } from '@taiga-ui/kit';
+import { ChatsWebsocketService } from '../../core/chats/services/chats-websocket.service';
+import { ChatsService } from '../../core/chats/services/chats.service';
+import { Message } from '../../core/models/message.model';
 import { ChatDetailsInfoComponent } from '../chat-details-info/chat-details-info.component';
 
 @Component({
@@ -75,12 +66,14 @@ export default class ChatDetailsComponent
   messages = signal<Message[]>([]);
   chatId = signal<number>(0);
   private routeSub?: Subscription;
+  private wsSubscription?: Subscription;
 
   constructor(
     public userService: UserService,
     private readonly chatService: ChatsService,
     private readonly route: ActivatedRoute,
-    private readonly wsService: ChatsWebsocketService
+    private readonly wsService: ChatsWebsocketService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngAfterViewInit() {
@@ -90,9 +83,12 @@ export default class ChatDetailsComponent
   private scrollToBottom(): void {
     try {
       const el = this.scrollContainer.nativeElement;
-      console.log(el.scrollHeight, el.scrollTop);
+      console.log('Прокрутка вниз:', {
+        scrollHeight: el.scrollHeight,
+        'scrollTop до': el.scrollTop,
+      });
       el.scrollTop = el.scrollHeight;
-      console.log(el.scrollHeight, el.scrollTop);
+      console.log('scrollTop после:', el.scrollTop);
     } catch (err) {
       console.error('Ошибка автоскролла:', err);
     }
@@ -100,13 +96,41 @@ export default class ChatDetailsComponent
 
   ngOnDestroy(): void {
     if (this.routeSub) this.routeSub.unsubscribe();
+    if (this.wsSubscription) this.wsSubscription.unsubscribe();
   }
 
   ngOnInit(): void {
     this.routeSub = this.route.params.subscribe((params) => {
-      const chatId = params['id'];
+      const chatId = parseInt(params['id'], 10); // Надежное преобразование в число
+      console.log('ID чата из маршрута:', chatId, 'тип:', typeof chatId);
       this.chatId.set(chatId);
       this.loadHistory(chatId);
+    });
+
+    this.wsSubscription = this.wsService.messages$.subscribe((msg) => {
+      if (msg.command === ResponseMessageCommand.NEW_MESSAGE) {
+        const { chatId: receivedChatId, message } = msg.data;
+        // Преобразуем оба значения в числа для надежного сравнения
+        const currentChatId = this.chatId();
+        const msgChatId =
+          typeof receivedChatId === 'string'
+            ? parseInt(receivedChatId, 10)
+            : receivedChatId;
+
+        console.log('Сравнение ID чатов:', {
+          'Текущий ID (this.chatId())': currentChatId,
+          'Тип текущего ID': typeof currentChatId,
+          'ID из сообщения': msgChatId,
+          'Тип ID из сообщения': typeof msgChatId,
+        });
+
+        if (msgChatId === currentChatId) {
+          console.log('Получено новое сообщение:', message);
+          this.messages.update((messages) => [...messages, message]);
+          this.cdr.detectChanges(); // Запуск обнаружения изменений
+          setTimeout(() => this.scrollToBottom(), 0);
+        }
+      }
     });
   }
 
@@ -114,7 +138,8 @@ export default class ChatDetailsComponent
     this.chatService.getHistory(chatId).subscribe((data) => {
       const { messages } = data;
       this.messages.set(messages);
-      setTimeout(() => this.scrollToBottom(), 0);
+      this.cdr.detectChanges(); // Запуск обнаружения изменений
+      setTimeout(() => this.scrollToBottom(), 100); // Небольшая задержка для рендеринга
     });
   }
 
@@ -123,7 +148,8 @@ export default class ChatDetailsComponent
   }
 
   sendMessage(message: string) {
-    const chatId = this.chatId() ?? 0;
+    const chatId = this.chatId();
+    console.log('Отправка сообщения в чат ID:', chatId, 'тип:', typeof chatId);
     this.wsService.send({
       data: {
         command: RequestMessageCommand.SEND_MESSAGE,
@@ -131,7 +157,6 @@ export default class ChatDetailsComponent
         chat_id: chatId,
       },
     });
-    setTimeout(() => this.scrollToBottom(), 0);
   }
 
   onEnterPressed(event: Event) {
