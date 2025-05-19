@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -17,7 +17,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TuiScrollService } from '@taiga-ui/cdk/services';
-import { TuiButton, TuiHint, TuiIcon } from '@taiga-ui/core';
+import { TuiButton, TuiHint, TuiIcon, TuiLoader } from '@taiga-ui/core';
 import { TuiAvatar } from '@taiga-ui/kit';
 import {
   TuiTextareaModule,
@@ -33,6 +33,13 @@ import { ChatsWebsocketService } from '../../core/chats/services/chats-websocket
 import { ChatsService } from '../../core/chats/services/chats.service';
 import { Message } from '../../core/models/message.model';
 import { ChatDetailsInfoComponent } from '../chat-details-info/chat-details-info.component';
+import { LoadingService } from '../../core/loading/services/loading.service';
+
+interface MessageGroup {
+  date: Date;
+  label: string;
+  messages: Message[];
+}
 
 @Component({
   selector: 'app-chat-details',
@@ -51,6 +58,7 @@ import { ChatDetailsInfoComponent } from '../chat-details-info/chat-details-info
     TuiAvatar,
     TuiHint,
     ChatDetailsInfoComponent,
+    TuiLoader,
   ],
   providers: [TuiScrollService],
 })
@@ -70,6 +78,7 @@ export default class ChatDetailsComponent
 
   constructor(
     public userService: UserService,
+    public loadingService: LoadingService,
     private readonly chatService: ChatsService,
     private readonly route: ActivatedRoute,
     private readonly wsService: ChatsWebsocketService,
@@ -110,23 +119,21 @@ export default class ChatDetailsComponent
     this.wsSubscription = this.wsService.messages$.subscribe((msg) => {
       if (msg.command === ResponseMessageCommand.NEW_MESSAGE) {
         const { chatId: receivedChatId, message } = msg.data;
-        // Преобразуем оба значения в числа для надежного сравнения
         const currentChatId = this.chatId();
         const msgChatId =
           typeof receivedChatId === 'string'
             ? parseInt(receivedChatId, 10)
             : receivedChatId;
 
-        console.log('Сравнение ID чатов:', {
-          'Текущий ID (this.chatId())': currentChatId,
-          'Тип текущего ID': typeof currentChatId,
-          'ID из сообщения': msgChatId,
-          'Тип ID из сообщения': typeof msgChatId,
-        });
-
         if (msgChatId === currentChatId) {
           console.log('Получено новое сообщение:', message);
-          this.messages.update((messages) => [...messages, message]);
+          this.messages.update((messages) => [
+            ...messages,
+            {
+              ...message,
+              createdAt: this.convertDate(message.createdAt.toString()),
+            },
+          ]);
           this.cdr.detectChanges(); // Запуск обнаружения изменений
           setTimeout(() => this.scrollToBottom(), 0);
         }
@@ -137,14 +144,67 @@ export default class ChatDetailsComponent
   loadHistory(chatId: number) {
     this.chatService.getHistory(chatId).subscribe((data) => {
       const { messages } = data;
-      this.messages.set(messages);
+      this.messages.set(
+        messages.map((msg) => ({
+          ...msg,
+          createdAt: this.convertDate(msg.createdAt.toString()),
+        }))
+      );
       this.cdr.detectChanges(); // Запуск обнаружения изменений
       setTimeout(() => this.scrollToBottom(), 100); // Небольшая задержка для рендеринга
     });
   }
 
+  convertDate(dateString: string): Date {
+    return new Date(dateString.replace(' ', 'T') + 'Z');
+  }
+
   isMyMessage(message: Message) {
     return this.userService.user?.id === message.sendedBy;
+  }
+  /** Проверяет, это сегодня */
+  private isToday(date: Date): boolean {
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  }
+
+  /** Проверяет, это вчера */
+  private isYesterday(date: Date): boolean {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return date.toDateString() === yesterday.toDateString();
+  }
+
+  private formatGroupLabel(date: Date): string {
+    if (this.isToday(date)) {
+      return 'Сегодня';
+    }
+    if (this.isYesterday(date)) {
+      return 'Вчера';
+    }
+    // например: "26 февраля"
+    const datePipe = new DatePipe('ru');
+    return datePipe.transform(date, 'd MMMM', undefined, 'ru')!;
+  }
+  get groupedMessages(): MessageGroup[] {
+    const groups: MessageGroup[] = [];
+    for (const msg of this.messages()) {
+      const d = new Date(msg.createdAt);
+      const dayKey = d.toDateString();
+      let group = groups.find((g) => g.date.toDateString() === dayKey);
+      if (!group) {
+        group = {
+          date: d,
+          label: this.formatGroupLabel(d),
+          messages: [],
+        };
+        groups.push(group);
+      }
+      group.messages.push(msg);
+    }
+    // при желании можно отсортировать группы по возрастанию даты:
+    groups.sort((a, b) => a.date.getTime() - b.date.getTime());
+    return groups;
   }
 
   sendMessage(message: string) {

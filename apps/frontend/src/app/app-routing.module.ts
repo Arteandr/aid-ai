@@ -17,6 +17,12 @@ const routes: Routes = [
         loadComponent: () => import('./pages/chat-page/chat-page.component'),
         children: [
           {
+            path: '',
+            loadComponent: () =>
+              import('./features/choose-chat/choose-chat.component'),
+            pathMatch: 'full',
+          },
+          {
             path: ':id',
             loadComponent: () =>
               import('./features/chat-details/chat-details.component'),

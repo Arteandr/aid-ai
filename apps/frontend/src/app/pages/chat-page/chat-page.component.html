@@ -2,7 +2,6 @@
   <div
     class="p-5 h-30 fixed top-0 sm:left-0 md:left-64 right-0 z-40 bg-white border-b border-gray-200 space-y-2"
   >
-    <div class="text-xl font-semibold w-full">Обращения</div>
     <form [formGroup]="filterForm" class="w-full flex gap-x-2">
       <div class="w-full">
         <tui-textfield tuiTextfieldSize="m">
@@ -31,12 +30,7 @@
         </button>
       </div>
       <div>
-        <button
-          size="m"
-          appearance="accent"
-          tuiButton
-          type="button"
-        >
+        <button size="m" appearance="accent" tuiButton type="button">
           <tui-icon icon="@tui.plus" />
           Добавить обращение
         </button>

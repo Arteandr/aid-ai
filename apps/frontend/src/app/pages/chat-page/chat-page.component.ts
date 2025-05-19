@@ -23,12 +23,12 @@ import { TuiSearch } from '@taiga-ui/layout';
 import { TuiSelectModule } from '@taiga-ui/legacy';
 import { ChatElementComponent } from '../../features/chat-element/chat-element.component';
 import { ChatsService } from '../../core/chats/services/chats.service';
-import { ChatEmptyComponent } from '../../features/chat-empty/chat-empty.component';
 import { tuiScrollbarOptionsProvider } from '@taiga-ui/core';
 import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ChatsWebsocketService } from '../../core/chats/services/chats-websocket.service';
 import { ResponseMessageCommand } from '../../core/chats/models/websocket-message.model';
+import { ChatEmptyComponent } from '../../features/chat-empty/chat-empty.component';
 
 @Component({
   selector: 'app-chat-page',
@@ -50,10 +50,8 @@ import { ResponseMessageCommand } from '../../core/chats/models/websocket-messag
     AsyncPipe,
     TuiButton,
     TuiAppearance,
-    ChatEmptyComponent,
     ChatElementComponent,
-    TuiSkeleton,
-    TuiScrollbar,
+    ChatEmptyComponent,
   ],
   providers: [
     tuiScrollbarOptionsProvider({

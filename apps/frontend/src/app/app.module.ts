@@ -1,5 +1,6 @@
 import { inject, NgModule, provideAppInitializer } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import '@angular/common/locales/global/ru';
 
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';

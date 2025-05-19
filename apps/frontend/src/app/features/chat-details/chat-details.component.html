@@ -1,55 +1,75 @@
 <div class="flex h-[calc(100vh-120px)]">
-  <!-- Левая часть: чат -->
   <div class="flex-3 p-5 h-full flex flex-col min-h-0">
-    <!-- Область сообщений с автопрокруткой и отступами между сообщениями -->
     <div
       #scrollbarContainer
       class="flex-1 flex flex-col gap-y-2 overflow-y-auto scrollbar-hidden"
       [ngClass]="{ 'justify-center items-center': messages().length === 0 }"
     >
-      <!-- Если сообщений нет, показать ng-content -->
       <ng-content *ngIf="messages().length === 0">
         <p>В этом чате пока нет сообщений</p>
       </ng-content>
 
-      <!-- Если сообщения присутствуют -->
       <ng-container *ngIf="messages().length > 0">
-        <div
-          *ngFor="let message of messages()"
-          class="flex gap-x-2"
-          [ngClass]="{
-            'justify-end': isMyMessage(message),
-            'justify-start': !isMyMessage(message)
-          }"
-        >
-          <tui-avatar
-            [tuiHint]="hintHim"
-            *ngIf="!isMyMessage(message)"
-            size="m"
-            >{{ message.sender.email.charAt(0) }}</tui-avatar
-          >
-          <ng-template #hintHim>{{ message.sender.email }}</ng-template>
+        <ng-container *ngFor="let group of groupedMessages">
+          <!-- Заголовок группы -->
+          <div class="text-center my-2 text-gray-500 font-medium">
+            {{ group.label }}
+          </div>
+
+          <!-- Сообщения группы -->
           <div
-            class="rounded-lg p-3 max-w-xs break-words shadow-md"
+            *ngFor="let message of group.messages"
+            class="flex gap-x-2"
             [ngClass]="{
-              'bg-blue-500 text-white': isMyMessage(message),
-              'bg-gray-300 text-gray-800': !isMyMessage(message)
+              'justify-end': isMyMessage(message),
+              'justify-start': !isMyMessage(message)
             }"
           >
-            <p class="text-sm">{{ message.text }}</p>
+            <!-- Аватар отправителя -->
+            <tui-avatar
+              [tuiHint]="hintHim"
+              *ngIf="!isMyMessage(message)"
+              size="m"
+            >
+              {{ message.sender.email.charAt(0) }}
+            </tui-avatar>
+            <ng-template #hintHim>{{ message.sender.email }}</ng-template>
+
+            <!-- Пузырёк с текстом и временем -->
+            <div
+              class="relative inline-block rounded-lg p-3 pr-12 break-words shadow-md"
+              [ngClass]="{
+                'bg-blue-500 text-white': isMyMessage(message),
+                'bg-gray-300 text-gray-800': !isMyMessage(message)
+              }"
+            >
+              <p class="text-sm">{{ message.text }}</p>
+              <span
+                class="absolute bottom-1 right-2 text-xs"
+                [ngClass]="{
+                  'text-gray-200': isMyMessage(message),
+                  'text-gray-600': !isMyMessage(message)
+                }"
+              >
+                {{ message.createdAt | date : "HH:mm" }}
+              </span>
+            </div>
+
+            <!-- Ваш аватар -->
+            <tui-avatar
+              [tuiHint]="hintMe"
+              *ngIf="isMyMessage(message)"
+              size="m"
+            >
+              {{ message.sender.email.charAt(0) }}
+            </tui-avatar>
+            <ng-template #hintMe>{{ message.sender.email }}</ng-template>
           </div>
-          <tui-avatar
-            [tuiHint]="hintMe"
-            *ngIf="isMyMessage(message)"
-            size="m"
-            >{{ message.sender.email.charAt(0) }}</tui-avatar
-          >
-          <ng-template #hintMe>{{ message.sender.email }}</ng-template>
-        </div>
+        </ng-container>
       </ng-container>
     </div>
 
-    <!-- Форма ввода сообщений -->
+    <!-- Форма ввода -->
     <form [formGroup]="messageForm" class="mt-3 flex flex-row gap-x-1">
       <tui-textarea
         formControlName="messageInput"
@@ -58,7 +78,6 @@
         placeholder="Введите сообщение..."
         class="flex-1"
       >
-        Введите сообщение..
       </tui-textarea>
       <div class="flex flex-col gap-y-1">
         <button
@@ -76,7 +95,4 @@
       </div>
     </form>
   </div>
-  <!-- <div class="lg:w-md md:w-sm sm:w-xs border-l border-gray-200 p-4">
-    <app-chat-details-info [chatId]="chatId()" />
-  </div> -->
 </div>
